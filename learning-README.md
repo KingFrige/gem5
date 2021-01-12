@@ -14,6 +14,7 @@ $ make -j4 & make install
 # set env -> PATH
 
 # install pip package
+$ pip3 install pyyaml
 $ pip3 install graphviz
 $ pip3 install pydot
 $ pip3 install pydot-ng
