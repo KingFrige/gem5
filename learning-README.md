@@ -25,6 +25,8 @@ $ pip3 install pydot-ng
 
 ```
 $ /usr/bin/python3 /usr/bin/scons build/X86/gem5.opt -j9
+
+$ /opt/python/Python-3.8.3/bin/python3 /usr/bin/scons build/X86_MSI/gem5.opt --default=X86 PROTOCOL=MSI SLICC_HTML=True -j9
 ```
 
 ### run test
