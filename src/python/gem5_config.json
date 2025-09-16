@@ -1,0 +1,8 @@
+{
+  "sources": {
+        "gem5-resources": {
+            "url": "/home/dongguangda/workspace/project/simulator/gem5/gem5/tests/gem5/resources/my-resources.json",
+            "isMongo": false
+        }
+    }
+}
