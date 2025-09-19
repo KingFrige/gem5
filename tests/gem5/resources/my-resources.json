@@ -1,6 +1,28 @@
 [
     {
         "category": "binary",
+        "id": "hello",
+        "description": "A test binary",
+        "architecture": "RISCV",
+        "size": 1,
+        "tags": [
+            "test"
+        ],
+        "is_zipped": false,
+        "md5sum": "6d9494d22b90d817e826b0d762fda973",
+        "source": "src/simple",
+        "url": "file:///home/dongguangda/workspace/project/simulator/gem5/gem5/tests/test-progs/hello/bin/riscv/linux/hello",
+        "license": "",
+        "author": [],
+        "source_url": "https://github.com/gem5/gem5-resources/tree/develop/src/simple",
+        "resource_version": "1.0.0",
+        "gem5_versions": [
+            ""
+        ],
+        "example_usage": "obtain_resource(resource_id=\"test-binary\")"
+    },
+    {
+        "category": "binary",
         "id": "rv64samt-ps-sysclone_d",
         "description": "A test binary",
         "architecture": "RISCV",

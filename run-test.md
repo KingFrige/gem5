@@ -53,6 +53,7 @@ $ ./main.py run --skip-build --bin-path=/home/dongguangda/workspace/project/risc
 ```bash
 $ GEM5_CONFIG=src/python/gem5_config.json ./build/RISCV/gem5.debug tests/gem5/asmtest/configs/riscv_asmtest.py rv64samt-ps-sysclone_d atomic
 $ GEM5_CONFIG=src/python/gem5_config.json ./build/RISCV/gem5.debug tests/gem5/asmtest/configs/riscv_asmtest.py hello atomic
+$ GEM5_CONFIG=src/python/gem5_config.json ./build/RISCV/gem5.debug --debug-file=test-run.log --debug-flags=Commit,O3CPU,Fetch tests/gem5/asmtest/configs/riscv_asmtest.py hello o3
 
 $ cd tests
 $ GEM5_CONFIG=../src/python/gem5_config.json ./main.py run --skip-build gem5/asmtest
