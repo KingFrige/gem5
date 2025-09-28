@@ -110,3 +110,20 @@ build/RISCV/gem5.debug \
 ```
 
 
+## view
+
+### O3 Pipeline Viewer
+
+```bash
+./build/RISCV/gem5.debug --debug-file=test-run-O3PipeView.log --debug-flags=O3PipeView configs/example/gem5_library/riscv-rvv-example.py -c 2 -v 256 -e 32 rvv-sgemm
+
+./util/o3-pipeview.py -c 500 -o pipeview.out --color m5out/test-run-O3PipeView.log
+less -r pipeview.out
+```
+
+### Konata
+
+```bash
+cd ../konata-linux-x64/
+./konata --no-sandbox ../gem5/m5out/test-run-O3PipeView.log
+```
