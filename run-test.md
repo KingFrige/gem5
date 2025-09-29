@@ -124,6 +124,7 @@ less -r pipeview.out
 ### Konata
 
 ```bash
-cd ../konata-linux-x64/
-./konata --no-sandbox ../gem5/m5out/test-run-O3PipeView.log
+# set kanata to $PATH
+$ module load konata/v0.39
+$ konata --no-sandbox ./m5out/test-run-O3PipeView.log
 ```
