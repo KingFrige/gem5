@@ -1,5 +1,11 @@
 # run test
 
+## unit test
+
+```bash
+$ scons build/RISCV/unittests.debug
+```
+
 ## riscv-tests
 
 ### check
