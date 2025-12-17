@@ -774,6 +774,41 @@ class FetchDirectedPrefetcher(BasePrefetcher):
     )
 
 
+class FNLMMAPrefetcher(QueuedPrefetcher):
+    # Paper: https://research.ece.ncsu.edu/wp-content/uploads/sites/19/2020/05/FNLMMA-final.pdf
+    type = "FNLMMAPrefetcher"
+    cxx_class = "gem5::prefetch::FNLMMA"
+    cxx_header = "mem/cache/prefetch/fnlmma.hh"
+
+    prefetch_on_access = False
+    use_virtual_addresses = True
+
+    log2_block_size = Param.Unsigned(6, "block size, log2(64)")
+    enable_AHEADPred = Param.Bool(True, "enable AHEAD predict")
+    dist_ahead = Param.Unsigned(10, "ahead distance")
+    nshift = Param.Unsigned(10, "shift")
+    log_mult_size = Param.Unsigned(
+        0,
+        "test other sizes of predictors:  +1 doubles the size of MMA table and FNL tables",
+    )
+    mma_filt_size = Param.Unsigned(24, "MMA filter entries")
+    ahead_max_dist = Param.Unsigned(80, "ahead max distance")
+    maxfnl = Param.Unsigned(
+        5,
+        "3 to 6  reaches approximately the same performance, but slightly more accesses to L2 with larger MAXFNL",
+    )
+    period_reset = Param.Unsigned(8192, "period reset")
+
+    nbway_Ishadow = Param.Unsigned(3, "I Shadow ways")
+
+    enable_fiterFNL = Param.Bool(True, "enable filter FNL entry")
+    nbway_filterFNL = Param.Unsigned(4, "nbway fileter")
+    sizeway_filterFNL = Param.Unsigned(32, "size of fileterFNL")
+
+    nbway_pred = Param.Unsigned(8, "nbway ahead pred")
+    log_tag_next_miss = Param.Unsigned(12, "tags bits")
+
+
 add_citation(
     FetchDirectedPrefetcher,
     """@inproceedings{10.1145/3613424.3614258,
