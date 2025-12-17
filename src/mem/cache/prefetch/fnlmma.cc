@@ -284,7 +284,8 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
         ////////
         // Next-line prefetch
         if (WorthPF[index] > 0) {
-            std::cout << "Next-line prefetch: " << Block << std::endl;
+            std::cout << std::hex << "prefetch FNL -> addr: 0x" << Block
+                      << std::dec << std::endl;
             if (WasNotJustAHEAD(Block)) {
                 for (int i = 1; i <= MAXFNL; i++) {
                     uint64_t pf_Block = Block + i;
