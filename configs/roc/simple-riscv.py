@@ -30,6 +30,7 @@ X86 ISA). More detailed documentation can be found in `simple.py`.
 """
 
 import argparse
+import os
 import sys
 from os import path
 

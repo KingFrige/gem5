@@ -49,18 +49,20 @@ Usage
 -----
 
 ```
-scons build/ALL/gem5.opt
-./build/ALL/gem5.opt \
-    configs/example/gem5_library/fdp-hello.py \
-    --isa <isa> \
-    [--disable-fdp]
+scons build/RISCV/gem5.debug
+
+./build/RISCV/gem5.debug \
+  configs/roc/demo.py \
+  --isa=RISCV \
+  --binary="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/build/403.gcc" \
+  --arguments="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/data/test/input/cccp.i" \
+  --arguments="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/data/test/input/cccp.in"
 ```
 """
 
 import argparse
-import sys
-from os import path
 
+from m5.objects import *
 from m5.objects import (
     TAGE_SC_L_64KB,
     BranchPredictor,
@@ -99,25 +101,10 @@ isa_choices = {
     "RISCV": ISA.RISCV,
 }
 
-workloads = {
-    "hello": {
-        "Arm": "arm-hello64-static",
-        "X86": "x86-hello64-static",
-        "RISCV": "riscv-hello",
-    },
-}
-
-
 parser = argparse.ArgumentParser(
     description="An example configuration script to run FDP."
 )
 
-thispath = os.path.dirname(os.path.realpath(__file__))
-binary = os.path.join(
-    thispath,
-    "../../",
-    "tests/test-progs/hello/bin/riscv/linux/hello",
-)
 parser.add_argument(
     "--isa",
     type=str,
@@ -127,16 +114,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--binary",
-    default=binary,
-    type=str,
-    help="add your riscv binary",
-)
-
-parser.add_argument(
     "--disable-fdp",
     action="store_true",
     help="Disable FDP to evaluate baseline performance.",
+)
+
+parser.add_argument(
+    "--binary",
+    type=str,
+    help="add your riscv binary",
 )
 
 parser.add_argument(
@@ -148,6 +134,9 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
+print(">>> ", args.isa)
+print(">>> ", args.arguments)
 
 
 # This check ensures the gem5 binary is compiled to the correct ISA target.
@@ -333,7 +322,8 @@ board = SimpleBoard(
 # program compiled to the specified ISA. The `Resource` class will automatically
 # download the binary from the gem5 Resources cloud bucket if it's not already
 # present.
-board.set_se_binary_workload(binary=args.binary, arguments=args.arguments)
+binary = BinaryResource(local_path=args.binary)
+board.set_se_binary_workload(binary=binary, arguments=args.arguments)
 
 # Lastly we run the simulation.
 simulator = Simulator(board=board)
