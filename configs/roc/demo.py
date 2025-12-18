@@ -51,12 +51,14 @@ Usage
 ```
 scons build/RISCV/gem5.debug
 
-./build/RISCV/gem5.debug \
+./build/RISCV/gem5.debug -re \
   configs/roc/demo.py \
   --isa=RISCV \
-  --binary="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/build/403.gcc" \
-  --arguments="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/data/test/input/cccp.i" \
-  --arguments="/home/samantha/workspace/project/simulator/gem5/gem5/example-test/403.gcc/data/test/input/cccp.in"
+  --binary="example-test/403.gcc/build/403.gcc" \
+  --arguments="example-test/403.gcc/data/test/input/cccp.i" \
+  --arguments="example-test/403.gcc/data/test/input/cccp.in" \
+  --arguments="-o" \
+  --arguments="cccp.s" \
 ```
 """
 
@@ -174,11 +176,8 @@ class CacheHierarchy(PrivateL1PrivateL2CacheHierarchy):
 
             self.l1icaches[i].prefetcher = MultiPrefetcher(
                 prefetchers=[
-                    StridePrefetcher(
-                        degree=8, latency=1, prefetch_on_access=True
-                    ),
                     FNLMMAPrefetcher(latency=2),
-                    TaggedPrefetcher(use_virtual_addresses=True),
+                    # TaggedPrefetcher(use_virtual_addresses=True),
                 ]
             )
 

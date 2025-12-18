@@ -204,8 +204,8 @@ FNLMMA::PrefAheadPredictedBlock(uint64_t Block,
             // avoid issing prefetch the block if the previous block was
             // prefetched
 
-            std::cout << std::hex << "prefetch Ahead -> addr: 0x" << Block
-                      << std::dec << std::endl;
+            std::cout << std::hex << "prefetch Ahead -> addr: 0x"
+                      << (Block << LOG2_BLOCK_SIZE) << std::dec << std::endl;
             addresses.push_back(AddrPriority(Block << LOG2_BLOCK_SIZE, 0));
 
             if (WorthPF[index] > 0) {
@@ -213,7 +213,8 @@ FNLMMA::PrefAheadPredictedBlock(uint64_t Block,
                     uint64_t pf_Block = Block + i;
                     if ((WasNotJustFnl(Block)) || (i == MAXFNL)) {
                         std::cout << std::hex << "prefetch Ahead -> addr: 0x"
-                                  << pf_Block << std::dec << std::endl;
+                                  << (pf_Block << LOG2_BLOCK_SIZE) << std::dec
+                                  << std::endl;
                         addresses.push_back(
                             AddrPriority(pf_Block << LOG2_BLOCK_SIZE, 0));
                     }
@@ -284,8 +285,6 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
         ////////
         // Next-line prefetch
         if (WorthPF[index] > 0) {
-            std::cout << std::hex << "prefetch FNL -> addr: 0x" << Block
-                      << std::dec << std::endl;
             if (WasNotJustAHEAD(Block)) {
                 for (int i = 1; i <= MAXFNL; i++) {
                     uint64_t pf_Block = Block + i;
@@ -293,7 +292,8 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
                     // prefetch Block block+FNL
                     if ((WasNotJustFnl(Block)) || (i == MAXFNL)) {
                         std::cout << std::hex << "prefetch FNL -> addr: 0x"
-                                  << pf_Block << std::dec << std::endl;
+                                  << (pf_Block << LOG2_BLOCK_SIZE) << std::dec
+                                  << std::endl;
                         addresses.push_back(
                             AddrPriority(pf_Block << LOG2_BLOCK_SIZE, 0));
                     }
@@ -364,10 +364,13 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
         if (debug::HWPrefetch) {
             std::cout << "output debug info" << std::endl;
             for (AddrPriority &addr_prio : addresses) {
-                std::cout << "prefetch addr: " << addr_prio.first << std::endl;
+                std::cout << std::hex << "prefetch addr: 0x" << addr_prio.first
+                          << std::dec << std::endl;
             }
         }
     }
+    std::cout << "end access" << std::endl;
+    std::cout << std::endl;
 }
 
 } // namespace prefetch
