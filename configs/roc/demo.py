@@ -55,7 +55,6 @@ scons build/RISCV/gem5.debug
   configs/roc/demo.py \
   --isa=RISCV \
   --binary="example-test/403.gcc/build/403.gcc" \
-  --arguments="example-test/403.gcc/data/test/input/cccp.i" \
   --arguments="example-test/403.gcc/data/test/input/cccp.in" \
   --arguments="-o" \
   --arguments="cccp.s" \
