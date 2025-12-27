@@ -146,7 +146,7 @@ print(">>> ", args.arguments)
 requires(isa_required=isa_choices[args.isa])
 
 # We use a single channel DDR3_1600 memory system
-memory = SingleChannelDDR3_1600(size="32MiB")
+memory = SingleChannelDDR3_1600(size="1024MiB")
 
 
 # 1. Instruction prefetcher ---------------------------------------------
