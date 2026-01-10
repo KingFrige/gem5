@@ -504,6 +504,9 @@ class InstObjParams:
         else:
             self.fp_enable_check = ""
 
+        with open(parser.output_dir + "/instruction_info.txt", "a") as f:
+            f.write(f"{self.mnemonic},{self.class_name},{self.op_class}\n")
+
     def padSrcRegIdx(self, padding):
         self.srcRegIdxPadding = padding
 

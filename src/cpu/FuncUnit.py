@@ -100,6 +100,7 @@ class OpClass(Enum):
         "MatrixOP",
         "MemRead",
         "MemWrite",
+        "MemAtomic",
         "FloatMemRead",
         "FloatMemWrite",
         "InstPrefetch",

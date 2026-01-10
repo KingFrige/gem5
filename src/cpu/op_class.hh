@@ -109,6 +109,7 @@ static const OpClass MatrixMovOp = enums::MatrixMov;
 static const OpClass MatrixOPOp = enums::MatrixOP;
 static const OpClass MemReadOp = enums::MemRead;
 static const OpClass MemWriteOp = enums::MemWrite;
+static const OpClass MemAtomicOp = enums::MemAtomic;
 static const OpClass FloatMemReadOp = enums::FloatMemRead;
 static const OpClass FloatMemWriteOp = enums::FloatMemWrite;
 static const OpClass SimdUnitStrideLoadOp = enums::SimdUnitStrideLoad;

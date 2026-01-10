@@ -188,6 +188,7 @@ class RdWrPort(FUDesc):
     opList = [
         OpDesc(opClass="MemRead"),
         OpDesc(opClass="MemWrite"),
+        OpDesc(opClass="MemAtomic"),
         OpDesc(opClass="FloatMemRead"),
         OpDesc(opClass="FloatMemWrite"),
         OpDesc(opClass="SimdUnitStrideLoad"),

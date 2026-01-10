@@ -2084,14 +2084,14 @@ decode QUADRANT default Unknown::unknown() {
                                       int32_t new_data = mem_data + a;
                                       *b = htole(new_data);
                                   });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x1: AtomicMemOp::amoswap_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
                     TypedAtomicOpFunctor<uint32_t> *amo_op =
                           new AtomicGenericOp<uint32_t>(Rs2_uw,
                                   [](uint32_t* b, uint32_t a){ *b = a; });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x4: AtomicMemOp::amoxor_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2102,7 +2102,7 @@ decode QUADRANT default Unknown::unknown() {
                                       uint32_t new_data = mem_data ^ a;
                                       *b = htole(new_data);
                                   });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x8: AtomicMemOp::amoor_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2113,7 +2113,7 @@ decode QUADRANT default Unknown::unknown() {
                                       uint32_t new_data = mem_data | a;
                                       *b = htole(new_data);
                                   });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0xc: AtomicMemOp::amoand_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2124,7 +2124,7 @@ decode QUADRANT default Unknown::unknown() {
                                       uint32_t new_data = mem_data & a;
                                       *b = htole(new_data);
                                   });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x10: AtomicMemOp::amomin_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2135,7 +2135,7 @@ decode QUADRANT default Unknown::unknown() {
                             int32_t new_data = (a < mem_data) ? a : mem_data;
                             *b = htole(new_data);
                         });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x14: AtomicMemOp::amomax_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2146,7 +2146,7 @@ decode QUADRANT default Unknown::unknown() {
                             int32_t new_data = (a > mem_data) ? a : mem_data;
                             *b = htole(new_data);
                         });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x18: AtomicMemOp::amominu_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2157,7 +2157,7 @@ decode QUADRANT default Unknown::unknown() {
                             uint32_t new_data = (a < mem_data) ? a : mem_data;
                             *b = htole(new_data);
                         });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 0x1c: AtomicMemOp::amomaxu_w({{
                     Rd_sd = Mem_sw;
                 }}, {{
@@ -2168,7 +2168,7 @@ decode QUADRANT default Unknown::unknown() {
                             uint32_t new_data = (a > mem_data) ? a : mem_data;
                             *b = htole(new_data);
                         });
-                }}, mem_flags=ATOMIC_RETURN_OP);
+                }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
             }
             0x3: decode RVTYPE {
                 0x1: decode AMOFUNCT {
@@ -2190,14 +2190,14 @@ decode QUADRANT default Unknown::unknown() {
                                           int64_t new_data = mem_data + a;
                                           *b = htole(new_data);
                                       });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x1: AtomicMemOp::amoswap_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
                         TypedAtomicOpFunctor<uint64_t> *amo_op =
                               new AtomicGenericOp<uint64_t>(Rs2_ud,
                                       [](uint64_t* b, uint64_t a){ *b = a; });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x4: AtomicMemOp::amoxor_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2208,7 +2208,7 @@ decode QUADRANT default Unknown::unknown() {
                                          uint64_t new_data = mem_data ^ a;
                                          *b = htole(new_data);
                                      });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x8: AtomicMemOp::amoor_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2219,7 +2219,7 @@ decode QUADRANT default Unknown::unknown() {
                                          uint64_t new_data = mem_data | a;
                                          *b = htole(new_data);
                                      });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0xc: AtomicMemOp::amoand_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2230,7 +2230,7 @@ decode QUADRANT default Unknown::unknown() {
                                          uint64_t new_data = mem_data & a;
                                          *b = htole(new_data);
                                      });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x10: AtomicMemOp::amomin_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2242,7 +2242,7 @@ decode QUADRANT default Unknown::unknown() {
                                                     a : mem_data;
                                 *b = htole(new_data);
                             });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x14: AtomicMemOp::amomax_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2254,7 +2254,7 @@ decode QUADRANT default Unknown::unknown() {
                                                     a : mem_data;
                                 *b = htole(new_data);
                             });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x18: AtomicMemOp::amominu_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2266,7 +2266,7 @@ decode QUADRANT default Unknown::unknown() {
                                                      a : mem_data;
                                 *b = htole(new_data);
                             });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                     0x1c: AtomicMemOp::amomaxu_d({{
                         Rd_sd = Mem_sd;
                     }}, {{
@@ -2278,7 +2278,7 @@ decode QUADRANT default Unknown::unknown() {
                                                      a : mem_data;
                                 *b = htole(new_data);
                             });
-                    }}, mem_flags=ATOMIC_RETURN_OP);
+                    }}, mem_flags=ATOMIC_RETURN_OP, inst_flags=MemAtomicOp);
                 }
             }
         }
