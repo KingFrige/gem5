@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2019 ARM Limited
+ * Copyright (c) 2025 Arm Limited
  * All rights reserved
  *
  * The license below extends only to copyright in the software and shall
@@ -10,9 +10,6 @@
  * terms below provided that you ensure that this notice is replicated
  * unmodified and in its entirety in all distributions of the software,
  * modified or unmodified, in source code or in binary form.
- *
- * Copyright (c) 2006 The Regents of The University of Michigan
- * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -38,17 +35,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "cpu/o3/checker.hh"
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
-#include "cpu/checker/cpu.hh"
-#include "cpu/checker/cpu_impl.hh"
-#include "cpu/o3/dyn_inst_ptr.hh"
-#include "cpu/o3/thread_state.hh"
+#include "mem/port_proxy.hh"
+
+namespace py = pybind11;
 
 namespace gem5
 {
 
-template
-class Checker<o3::DynInstPtr>;
+void
+pybind_init_port(py::module_ &m_native)
+{
+    py::module_ m = m_native.def_submodule("port");
+
+    py::class_<gem5::PortProxy>(m, "PyPort")
+        .def(
+            "read",
+            [](gem5::PortProxy &self, Addr phys_addr, uint64_t size) {
+                std::vector<uint8_t> buffer(size);
+                if (!self.tryReadBlob(phys_addr, buffer.data(), size)) {
+                    throw std::runtime_error(csprintf(
+                        "Failed to read from address: %#x\n", phys_addr));
+                }
+                return py::bytes(reinterpret_cast<const char *>(buffer.data()),
+                                 size);
+            },
+            py::arg("addr"), py::arg("size"),
+            "Read size bytes from addr and return as Python bytes")
+        .def(
+            "write",
+            [](gem5::PortProxy &self, Addr phys_addr, py::buffer src_buf) {
+                py::buffer_info info = src_buf.request();
+
+                if (!self.tryWriteBlob(
+                        phys_addr, reinterpret_cast<const uint8_t *>(info.ptr),
+                        info.size)) {
+                    throw std::runtime_error(csprintf(
+                        "Failed to write to address: %#x\n", phys_addr));
+                }
+            },
+            py::arg("addr"), py::arg("data"),
+            "Write from any 1D byte-like buffer into memory at addr");
+}
 
 } // namespace gem5

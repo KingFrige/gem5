@@ -1,5 +1,4 @@
-# -*- mode:python -*-
-# Copyright (c) 2024-2025 Arm Limited
+# Copyright (c) 2025 Arm Limited
 # All rights reserved.
 #
 # The license below extends only to copyright in the software and shall
@@ -34,58 +33,70 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import argparse
 
-from m5.objects.ClockedObject import ClockedObject
-from m5.objects.TlmController import TlmController
-from m5.params import *
-from m5.SimObject import (
-    PyBindMethod,
+import m5
+from m5.objects import *
+
+
+def check_value(name, result, expected):
+    if result != expected:
+        print(f"Test {name} FAILED")
+        exit(1)
+    else:
+        print(f"Test {name} SUCCESS")
+
+
+parser = argparse.ArgumentParser(description="Simple PyPort tester")
+
+args = parser.parse_args()
+
+# even if this is only a traffic generator, call it cpu to make sure
+# the scripts are happy
+
+# system simulated
+system = System(
+    physmem=SimpleMemory(range=AddrRange("512MiB")),
+    membus=SystemXBar(),
+    clk_domain=SrcClockDomain(clock="1GHz", voltage_domain=VoltageDomain()),
 )
-from m5.tlm_chi.port import (
-    TlmSinkPort,
-    TlmSourcePort,
-)
 
+# connect the system port even if it is not used in this example
+system.system_port = system.membus.cpu_side_ports
 
-class TlmGenerator(ClockedObject):
-    type = "TlmGenerator"
-    cxx_header = "mem/ruby/protocol/chi/tlm/generator.hh"
-    cxx_class = "gem5::tlm::chi::TlmGenerator"
+# connect memory to the membus
+system.physmem.port = system.membus.mem_side_ports
 
-    cxx_exports = [
-        PyBindMethod("scheduleTransaction"),
-        PyBindMethod("enqueueBack"),
-    ]
+# -----------------------
+# run simulation
+# -----------------------
 
-    _transactions = []
+root = Root(full_system=False, system=system)
 
-    def inject(self, payload, phase, when=None):
-        from m5.tlm_chi.utils import Transaction
+m5.instantiate()
 
-        transaction = Transaction(payload, phase)
+# Get a system PyPort
+port = root.system.physProxy
 
-        if when:
-            self._transactions.append((when, transaction))
-        else:
-            self.getCCObject().enqueueBack(transaction)
+# Test a bytearray as write argument
+address = 0
+ba = bytearray(b"\xaa\xbb\xcc")
+port.write(address, ba)
+result = port.read(address, len(ba))
+check_value("bytearray test", result, ba)
 
-        return transaction
+# Test a byte literal as write argument
+address = 0
+bl = b"\xaa\xbb\xcc"
+port.write(address, bl)
+result = port.read(address, len(bl))
+check_value("byte literal test", result, bl)
 
-    def init(self):
-        for when, tr in self._transactions:
-            self.getCCObject().scheduleTransaction(when, tr)
+# Test a integer converted in byte format
+address = 64
+value = 35
+port.write(address, value.to_bytes())
+result = port.read(address, 1)
+check_value("byte from integer test", int.from_bytes(result), value)
 
-    cpu_id = Param.Int("TlmGenerator CPU identifier")
-    tran_per_cycle = Param.Unsigned(
-        2,
-        "Number of transaction per cycle to be scheduled "
-        "(For transactions injected with the inject method "
-        "and not with injectAt, which forces a transaction to "
-        "be injected at a specific tick overriding any clock "
-        "based timing)",
-    )
-    max_pending_tran = OptionalParam.Unsigned(
-        "Max number of pending transactions issued via the inject API"
-    )
-    in_port = TlmSinkPort("CHI TLM input/response port")
-    out_port = TlmSourcePort("CHI TLM output/request port")
+sys.exit(0)

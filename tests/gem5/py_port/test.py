@@ -1,5 +1,5 @@
 # -*- mode:python -*-
-# Copyright (c) 2024-2025 Arm Limited
+# Copyright (c) 2025 Arm Limited
 # All rights reserved.
 #
 # The license below extends only to copyright in the software and shall
@@ -34,58 +34,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""
+Test file for PyPort test
+"""
 
-from m5.objects.ClockedObject import ClockedObject
-from m5.objects.TlmController import TlmController
-from m5.params import *
-from m5.SimObject import (
-    PyBindMethod,
+from testlib import *
+
+gem5_verify_config(
+    name="simple_py_port",
+    verifiers=(),  # No need for verfiers this will return non-zero on fail
+    config=joinpath(getcwd(), "read-write.py"),
+    config_args=[],
+    valid_isas=(constants.all_compiled_tag,),
+    length=constants.quick_tag,
 )
-from m5.tlm_chi.port import (
-    TlmSinkPort,
-    TlmSourcePort,
-)
-
-
-class TlmGenerator(ClockedObject):
-    type = "TlmGenerator"
-    cxx_header = "mem/ruby/protocol/chi/tlm/generator.hh"
-    cxx_class = "gem5::tlm::chi::TlmGenerator"
-
-    cxx_exports = [
-        PyBindMethod("scheduleTransaction"),
-        PyBindMethod("enqueueBack"),
-    ]
-
-    _transactions = []
-
-    def inject(self, payload, phase, when=None):
-        from m5.tlm_chi.utils import Transaction
-
-        transaction = Transaction(payload, phase)
-
-        if when:
-            self._transactions.append((when, transaction))
-        else:
-            self.getCCObject().enqueueBack(transaction)
-
-        return transaction
-
-    def init(self):
-        for when, tr in self._transactions:
-            self.getCCObject().scheduleTransaction(when, tr)
-
-    cpu_id = Param.Int("TlmGenerator CPU identifier")
-    tran_per_cycle = Param.Unsigned(
-        2,
-        "Number of transaction per cycle to be scheduled "
-        "(For transactions injected with the inject method "
-        "and not with injectAt, which forces a transaction to "
-        "be injected at a specific tick overriding any clock "
-        "based timing)",
-    )
-    max_pending_tran = OptionalParam.Unsigned(
-        "Max number of pending transactions issued via the inject API"
-    )
-    in_port = TlmSinkPort("CHI TLM input/response port")
-    out_port = TlmSourcePort("CHI TLM output/request port")
