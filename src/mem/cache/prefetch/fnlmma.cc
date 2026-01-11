@@ -261,7 +261,7 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
             if ((cache_hit == 0) ||
                 (WorthPF[previndex])) { // this allows to reduce the pressure
                                         // on L2
-                WorthPF[previndex] = 3;
+                WorthPF[index] = 3;
             }
         }
 

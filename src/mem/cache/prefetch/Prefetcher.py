@@ -780,8 +780,8 @@ class FNLMMAPrefetcher(QueuedPrefetcher):
     cxx_class = "gem5::prefetch::FNLMMA"
     cxx_header = "mem/cache/prefetch/fnlmma.hh"
 
-    prefetch_on_access = False
-    use_virtual_addresses = True
+    prefetch_on_access = True
+    use_virtual_addresses = False
 
     log2_block_size = Param.Unsigned(6, "block size, log2(64)")
     enable_AHEADPred = Param.Bool(True, "enable AHEAD predict")
