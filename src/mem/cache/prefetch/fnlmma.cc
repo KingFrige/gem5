@@ -94,7 +94,7 @@ FNLMMA::FNLMMA(const FNLMMAPrefetcherParams &p)
       AHEAD(this),
       AHEADphist(this)
 {
-    std::cout << " L1I prefetcher" << std::endl;
+    DPRINTF(HWPrefetch, " L1I prefetcher\n");
     AHEAD.init(DISTAHEAD);
     AHEADphist.init(DISTAHEAD);
     PrefetchCandidate = 0;
@@ -108,8 +108,8 @@ FNLMMA::JustFnl(uint64_t Block)
     uint64_t set = (Block & (SIZEWAYFILTERFNL - 1));
     uint64_t tag = (Block / SIZEWAYFILTERFNL) & ((1 << 15) - 1);
 
-    std::cout << "JustFnl -> Block: 0x" << std::hex << Block << ", set: 0x"
-              << set << ", tag: 0x" << tag << std::dec << std::endl;
+    DPRINTF(HWPrefetch, "JustFnl -> Block: 0x%x, set: 0x%x, tag: 0x%x\n",
+            Block, set, tag);
     for (int i = NBWAYFILTERFNL - 1; i > 0; i--) {
         JUSTNLPREFETCH[set][i] = JUSTNLPREFETCH[set][i - 1];
     }
@@ -131,9 +131,10 @@ FNLMMA::WasNotJustFnl(uint64_t Block)
         }
     }
 
-    std::cout << "WasNotJustFnl -> Block: 0x" << std::hex << Block
-              << ", set: 0x" << set << ", tag: 0x" << tag
-              << ", WasNotJustFnl: " << ret << std::dec << std::endl;
+    DPRINTF(HWPrefetch,
+            "WasNotJustFnl -> Block: 0x%x, set: 0x%x, tag: 0x%x, "
+            "WasNotJustFnl: %d\n",
+            Block, set, tag, ret);
     return ret;
 }
 
@@ -187,9 +188,9 @@ FNLMMA::IsInIShadow(uint64_t Block, bool Insert)
         }
         ShadowICache[set][0] = tag;
     }
-    std::cout << "IsInIShadow -> Block: 0x" << std::hex << Block << ", set: 0x"
-              << set << ", tag: 0x" << tag << ", Hit: 0x" << Hit << std::dec
-              << std::endl;
+    DPRINTF(HWPrefetch,
+            "IsInIShadow -> Block: 0x%x, set: 0x%x, tag: 0x%x, Hit: 0x%x\n",
+            Block, set, tag, Hit);
     return (Hit != -1);
 }
 
@@ -204,17 +205,16 @@ FNLMMA::PrefAheadPredictedBlock(uint64_t Block,
             // avoid issing prefetch the block if the previous block was
             // prefetched
 
-            std::cout << std::hex << "prefetch Ahead -> addr: 0x"
-                      << (Block << LOG2_BLOCK_SIZE) << std::dec << std::endl;
+            DPRINTF(HWPrefetch, "prefetch Ahead -> addr: 0x%x\n",
+                    (Block << LOG2_BLOCK_SIZE));
             addresses.push_back(AddrPriority(Block << LOG2_BLOCK_SIZE, 0));
 
             if (WorthPF[index] > 0) {
                 for (int i = 1; i <= MAXFNL; i++) {
                     uint64_t pf_Block = Block + i;
                     if ((WasNotJustFnl(Block)) || (i == MAXFNL)) {
-                        std::cout << std::hex << "prefetch Ahead -> addr: 0x"
-                                  << (pf_Block << LOG2_BLOCK_SIZE) << std::dec
-                                  << std::endl;
+                        DPRINTF(HWPrefetch, "prefetch Ahead -> addr: 0x%x\n",
+                                (pf_Block << LOG2_BLOCK_SIZE));
                         addresses.push_back(
                             AddrPriority(pf_Block << LOG2_BLOCK_SIZE, 0));
                     }
@@ -242,14 +242,14 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
 
     bool cache_hit = !pfi.isCacheMiss();
 
-    std::cout << "access addr: 0x" << std::hex << addr << ", cache_hit: 0x"
-              << static_cast<int>(cache_hit) << std::dec << std::endl;
+    DPRINTF(HWPrefetch, "access addr: 0x%x, cache_hit: 0x%x\n", addr,
+            static_cast<int>(cache_hit));
     uint64_t Block = addr >> LOG2_BLOCK_SIZE;
     int index = Block & (FNL_NBENTRIES - 1);
     bool ShadowMiss = (!IsInIShadow(Block, 1));
     uint64_t AheadPredictedBlock = 0;
     // prefetch is triggered only on misses on the Shadow I-cache
-    std::cout << "ShadowMiss: " << ShadowMiss << std::endl;
+    DPRINTF(HWPrefetch, "ShadowMiss: %d\n", ShadowMiss);
     if (ShadowMiss) {
         // The FNL prefetcher
         /////// Manage if it is worth prefetching next block
@@ -265,7 +265,7 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
             }
         }
 
-        std::cout << std::dec << "start ptReset: " << ptReset << std::endl;
+        DPRINTF(HWPrefetch, "start ptReset: %d\n", ptReset);
         for (int i = ptReset; i < ptReset + (FNL_NBENTRIES / PERIODRESET); i++)
         // Once a block has become worth prefetching, it keeps this status for
         // at least three intervals of PERIODRESET I-Shadow misses
@@ -280,7 +280,7 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
         }
         ptReset += (FNL_NBENTRIES / PERIODRESET);
         ptReset &= (FNL_NBENTRIES - 1);
-        std::cout << "end ptReset: " << ptReset << std::endl;
+        DPRINTF(HWPrefetch, "end ptReset: %d\n", ptReset);
 
         ////////
         // Next-line prefetch
@@ -291,9 +291,8 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
                     // if Block B-1 was accessed recently one has only to
                     // prefetch Block block+FNL
                     if ((WasNotJustFnl(Block)) || (i == MAXFNL)) {
-                        std::cout << std::hex << "prefetch FNL -> addr: 0x"
-                                  << (pf_Block << LOG2_BLOCK_SIZE) << std::dec
-                                  << std::endl;
+                        DPRINTF(HWPrefetch, "prefetch FNL -> addr: 0x%x\n",
+                                (pf_Block << LOG2_BLOCK_SIZE));
                         addresses.push_back(
                             AddrPriority(pf_Block << LOG2_BLOCK_SIZE, 0));
                     }
@@ -311,9 +310,10 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
         if (AHEADPRED) {
             AheadPredictedBlock = AHEADphist.AheadPredict(
                 (addr >> 2) ^ (PREVADDR[NSHIFT - 1] << 1));
-            std::cout << std::hex << "MMA-AHEADphist -> addr: 0x" << addr
-                      << ", AheadPredictedBlock: 0x" << AheadPredictedBlock
-                      << std::dec << std::endl;
+            DPRINTF(
+                HWPrefetch,
+                "MMA-AHEADphist -> addr: 0x%x, AheadPredictedBlock: 0x%x\n",
+                addr, AheadPredictedBlock);
             AheadPredictedBlock =
                 PrefAheadPredictedBlock(AheadPredictedBlock, addresses);
 
@@ -321,9 +321,9 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
             if (AheadPredictedBlock == 0) {
                 //////////////
                 AheadPredictedBlock = AHEAD.AheadPredict(addr >> 2);
-                std::cout << std::hex << "MMA-AHEAD -> addr: 0x" << addr
-                          << ", AheadPredictedBlock: 0x" << AheadPredictedBlock
-                          << std::dec << std::endl;
+                DPRINTF(HWPrefetch,
+                        "MMA-AHEAD -> addr: 0x%x, AheadPredictedBlock: 0x%x\n",
+                        addr, AheadPredictedBlock);
 
                 AheadPredictedBlock =
                     PrefAheadPredictedBlock(AheadPredictedBlock, addresses);
@@ -362,15 +362,14 @@ FNLMMA::calculatePrefetch(const PrefetchInfo &pfi,
             }
         }
         if (debug::HWPrefetch) {
-            std::cout << "output debug info" << std::endl;
+            DPRINTF(HWPrefetch, "output debug info\n");
             for (AddrPriority &addr_prio : addresses) {
-                std::cout << std::hex << "prefetch addr: 0x" << addr_prio.first
-                          << std::dec << std::endl;
+                DPRINTF(HWPrefetch, "prefetch addr: 0x%x\n", addr_prio.first);
             }
         }
     }
-    std::cout << "end access" << std::endl;
-    std::cout << std::endl;
+    DPRINTF(HWPrefetch, "end access\n");
+    DPRINTF(HWPrefetch, "\n");
 }
 
 } // namespace prefetch
